@@ -6,7 +6,7 @@ import io
 
 # Dati input
 st.title('Simulatore PAC')
-st.markdown("Simula l'andamento di un PAC in base ai dati dei rendimenti reali imputati (il default è impostato sui valori del [CreditSuisse Yearbook](https://www.credit-suisse.com/about-us/it/reports-ricerca/studi-pubblicazioni.html)).")
+st.markdown("Simula l'andamento di un PAC in base ai dati dei rendimenti reali medi annui imputati (il default è impostato sui valori del [CreditSuisse Yearbook](https://www.credit-suisse.com/about-us/it/reports-ricerca/studi-pubblicazioni.html)).")
 
 numero_pac = st.number_input('Quanti PAC vuoi simulare?',step=1.0)
 
