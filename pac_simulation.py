@@ -8,7 +8,7 @@ import io
 st.title('Simulatore PAC')
 st.markdown("Simula l'andamento di un PAC in base ai dati dei rendimenti reali imputati (il default è impostato sui valori del [CreditSuisse Yearbook](https://www.credit-suisse.com/about-us/it/reports-ricerca/studi-pubblicazioni.html)).")
 
-numero_pac = st.number_input('Quanti PAC vuoi simulare?',step=1.0,value=1.0)
+numero_pac = st.number_input('Quanti PAC vuoi simulare?',step=1,value=1)
 
 keys = ['numero_asset','mesi','tempo','infla','azioni','bond_lt','bond_bt','versamento_mensile']
 dati_input = {key: {} for key in keys}
@@ -25,8 +25,14 @@ for i in range(int(numero_pac)):
 st.header('Dati di input')
 for i in ris.keys():
     st.subheader('Inserisci i dati di input del ' + i)
-    ris[i]['numero_asset'] = st.multiselect('Da quante asset class è costituisto il PAC',[1,2,3],[1], key=i)
-    ris[i]['tipo_asset'] = st.multiselect('Quale/quali asset class sono contenute nel PAC?',['Azioni','Bond','Materasso (inflazione)'],['Azioni'], key=i)
+    ris[i]['numero_asset'] = int(st.number_input('Da quante asset class è costituisto il PAC',min_value=1, max_value=3, value=1, key=i))
+    
+    if (ris[i]['numero_asset'] == 1) | (ris[i]['numero_asset'] == 2):
+        ris[i]['tipo_asset'] = st.multiselect('Quale/quali asset class sono contenute nel PAC?',['Azioni','Bond','Materasso (inflazione/conto corrente)'],['Azioni'], key=i)
+    else:
+        st.write('Selezionado 3 asset class vengono caricate di default quella: azionaria, obbligazionaria e la proxy del conto corrente.')
+        ris[i]['tipo_asset'] = {'Azioni','Bond','Materasso (inflazione/conto corrente)'}
+    
     ris[i]['mesi'] = 12
     ris[i]['tempo'] = st.number_input('Per quanti anni rimane attivo il PAC',value=20, key=i)
     ris[i]['infla'] = st.number_input('Inserire target % di inflazione media annua, come proxy del "lasciare i soldi sotto al materasso"',value=2.0, key=i)
@@ -44,24 +50,23 @@ for i in ris.keys():
     v = [ris[i]['versamento_mensile']]*int(numero_pac)
     ptf = np.zeros((1,int(ris[i]['mesi']*ris[i]['tempo'])))
     
-    if ris[i]['numero_asset'][0] == 1:
+    if ris[i]['numero_asset'] == 1:
         if ris[i]['tipo_asset'][0] == 'Azioni':
             rend_ptf = rend_az_mon
         elif ris[i]['tipo_asset'][0] == 'Bond':
             rend_ptf = rend_bond_mon
         else:
             rend_ptf = rend_infla_mon
-
-    elif ris[i]['numero_asset'][0] == 2:
+    elif ris[i]['numero_asset'] == 2:
         if set(ris[i]['tipo_asset']) == {'Azioni','Bond'}:
-            rend_ptf = (rend_az_mon+rend_bond_mon)/ris[i]['numero_asset'][0]
-        elif set(ris[i]['tipo_asset']) == {'Azioni','Materasso (inflazione)'}:
-            rend_ptf = (rend_az_mon+rend_infla_mon)/ris[i]['numero_asset'][0]
+            rend_ptf = (rend_az_mon+rend_bond_mon)/ris[i]['numero_asset']
+        elif set(ris[i]['tipo_asset']) == {'Azioni','Materasso (inflazione/conto corrente)'}:
+            rend_ptf = (rend_az_mon+rend_infla_mon)/ris[i]['numero_asset']
         else:
-            rend_ptf = (rend_bond_mon+rend_infla_mon)/ris[i]['numero_asset'][0]
+            rend_ptf = (rend_bond_mon+rend_infla_mon)/ris[i]['numero_asset']
 
     else:
-        rend_ptf = (rend_az_mon+rend_bond_mon+rend_infla_mon)/ris[i]['numero_asset'][0]
+        rend_ptf = (rend_az_mon+rend_bond_mon+rend_infla_mon)/ris[i]['numero_asset']
     
     
     for z in range(ptf.shape[0]):
