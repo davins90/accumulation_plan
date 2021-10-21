@@ -51,13 +51,15 @@ for i in ris.keys():
             rend_ptf = rend_bond_mon
         else:
             rend_ptf = rend_infla_mon
+
     elif ris[i]['numero_asset'][0] == 2:
-        if ris[i]['tipo_asset'][0] == ['Azioni','Bond']:
+        if set(ris[i]['tipo_asset']) == {'Azioni','Bond'}:
             rend_ptf = (rend_az_mon+rend_bond_mon)/ris[i]['numero_asset'][0]
-        elif ris[i]['tipo_asset'][0] == ['Azioni','Materasso (inflazione)']:
+        elif set(ris[i]['tipo_asset']) == {'Azioni','Materasso (inflazione)'}:
             rend_ptf = (rend_az_mon+rend_infla_mon)/ris[i]['numero_asset'][0]
         else:
             rend_ptf = (rend_bond_mon+rend_infla_mon)/ris[i]['numero_asset'][0]
+
     else:
         rend_ptf = (rend_az_mon+rend_bond_mon+rend_infla_mon)/ris[i]['numero_asset'][0]
     
@@ -91,13 +93,3 @@ with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
     summary.to_excel(writer,'sommario')
     writer.save()
     st.download_button(label="Scarica il file con i dati delle simulazioni!",data=buffer,file_name="pac_simulation.xlsx",mime="application/vnd.ms-excel")
-
-# towrite = io.BytesIO()
-# downloaded_file = final.to_excel(towrite, encoding='utf-8', index=False, header=True)
-# towrite.seek(0)  
-# b64 = base64.b64encode(towrite.read()).decode()  
-# linko= f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="pac_simulation.xlsx">Download excel file</a>'
-# st.markdown(linko, unsafe_allow_html=True)
-
-
-
