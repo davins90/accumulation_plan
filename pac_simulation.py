@@ -86,6 +86,7 @@ for i in ris.keys():
     final = final.rename(columns={0:i})
     
     summary.at[i,'versione pac'] = i
+    summary.at[i,'composizione asset class'] = set(ris[i]['tipo_asset'])
     summary.at[i,'quota versamento mensile'] = v[0]
     summary.at[i,'capitale versato'] = v[0]*ptf.shape[0]
     summary.at[i,'montante finale'] = ptf.tail(1).iloc[0].values[0]
